@@ -1,4 +1,5 @@
-# r-project
+r-project
+=========
 
 This is an example project to illustrate some organization and reproducability concepts for the _Policy & Data Studio_ course in Summer 2020. 
 
@@ -8,10 +9,9 @@ You will first need to download and install [R](https://cran.rstudio.com/) and [
 
 Then clone this project repository and open the file `r-project.Rproj` to launch the project in R Studio. 
 
-This project uses [`renv`](https://rstudio.github.io/renv/articles/renv.html) to handle dependency managemnt. To get set up a dedicated version of R and install all the required packages installed, run the following on the R console in RStudio:
+This project uses [`renv`](https://rstudio.github.io/renv/articles/renv.html) to handle dependency managemnt. When you launch the project in RStudio this package will automatically be installed (you can do so manually using `install.packages("renv")`). Then to install all the required packages, run the following on the R console in RStudio, and when prompted, select the option `Restore the project from the lockfile.`:
 
 ```r
-install.packages("renv")
 renv::init()
 ```
 
@@ -22,7 +22,7 @@ To access your API key without risking it being published on GitHub this project
 
 ## Replicating the Analysis
 
-The entire analysis and all files can be replicated by running `source("code/00_make.R")`, which in turn will run all the the other scripts and notebooks in [`/code`](/code). 
+The entire analysis and all files can be replicated by running `source("code/00_make.R")`, which in turn will run all the the other numbered scripts and notebooks in [`/code`](/code). 
 
 Alternatively, you can run each step individually following the numbered ordering of files:
 
