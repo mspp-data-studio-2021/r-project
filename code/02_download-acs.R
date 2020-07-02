@@ -1,5 +1,6 @@
 library(tidyverse)
 library(tidycensus)
+library(feather)
 library(here)
 library(dotenv) # load secrets from .env
 
@@ -29,3 +30,6 @@ acs_tracts_raw <- get_acs(
 )
 
 write_rds(acs_tracts_raw, here("data", "raw", "acs-2018-nyc-tracts.rds"))
+
+# for python compatibility
+write_feather(acs_tracts_raw, here("data", "raw", "acs-2018-nyc-tracts.feather"))
