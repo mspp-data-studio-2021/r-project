@@ -59,3 +59,80 @@ ggsave(here("img", "nyc_hh_inc_map.png"), nyc_hh_inc_map, width = 6, height = 6)
 ```
 
 ![](../img/nyc_hh_inc_map.png)
+```{r}
+library(plotly)
+
+p <- ggplot(nyc_tracts_acs_sf) +
+  aes(x = rent_burden_medE, y = hh_inc_medE, color = boroname) +
+  geom_point()
+
+ggplotly(p)
+```
+
+```{r}
+p <- ggplot(nyc_tracts_acs_sf) +
+  aes(x = rent_burden_medE, y = hh_inc_medE) +
+  geom_point() +
+  facet_wrap(~boroname)
+
+ggplotly(p)
+```
+
+## Interactive Maps in R with Leaflet
+
+Leaflet is a popular javascript web mapping framework, and there is a [leaflet R package](https://rstudio.github.io/leaflet/) that allows you to create interactive maps directly from sf dataframes that we have been using. 
+
+
+
+```{r}
+library(leaflet)
+library(leaflet.mapboxgl) # remotes::install_github("rstudio/leaflet.mapboxgl")
+
+# If you want to create custom basemaps and use those, you'll need a token, but
+# we'll be using preexisting ones from mapbox so we can set this to NA
+
+options(mapbox.accessToken = "pk.eyJ1IjoiYXVzdGVuc2VuIiwiYSI6ImNqa2lnOXJhYTAwOHgzcnM2bDk1b2wyMzQifQ.4TZ4jUC2_LDICORTKVR3yg")
+
+# This creates a function that takes a column of values and categorizes them an
+# matches it to a color in the way that leaflet requires
+hh_inc_pal <- colorBin(viridisLite::viridis(5), nyc_tracts_acs_sf$hh_inc_medE, n=5)
+
+nyc_map_leaflet <- nyc_tracts_acs_sf %>% 
+  # You should always re-project your data into lat/lon 4326 CRS
+  st_transform(4326) %>% 
+  leaflet() %>% 
+  # This option doesn't require a token
+  # addProviderTiles(providers$CartoDB.Positron) %>% 
+  # This option requires a token - you can use mine to test it out today, but
+  # then need to sig up for your own (free) token
+  addMapboxGL(style = "mapbox://styles/mapbox/light-v9") %>%
+  # For point data use addCircleMarkers()
+  addPolygons(
+    # In leaflet to refer to columns in your dataframe in arguments use the ~ at the beginning
+    fillColor = ~hh_inc_pal(hh_inc_medE),
+    fillOpacity = 0.7,
+    color = "white",
+    weight = 0.5,
+    # You can use html to format this any way you want. Here we use str_glue()
+    # to insert values from our columns and use R formatting funcitons.
+    # Everything inside the {} gets evaluated as R code
+    popup = ~str_glue("<strong>Median Household Income (2014-2018)</strong><br>
+                      {scales::dollar(hh_inc_medE)} (±{scales::comma(hh_inc_medM, 1)})")
+  ) %>% 
+  addLegend(
+    position = "topleft", 
+    pal = hh_inc_pal, 
+    values = ~hh_inc_medE, 
+    labFormat = labelFormat(prefix = "$"),
+    title = "Median Household Income<br>by Census Tract (2014-2018)"
+  )
+
+nyc_map_leaflet
+```
+
+If you print the result of the leaflet functions the interactive map can be included directly in the final Rmarkdown document, but this only wors with the `html_output` option. You can also use the `htmlwidgets` package to export our map to an HTML file. You can even then host this as mini website using GitHub (ask me for examples/help if you want to do this, it's not that hard).
+
+```{r}
+htmlwidgets::saveWidget(nyc_map_leaflet, here("docs", "nyc-map-leaflet.html"), selfcontained = TRUE)
+```
+
