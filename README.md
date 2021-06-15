@@ -1,7 +1,7 @@
 r-project
 =========
 
-This is an example project to illustrate some organization and reproducability concepts for the _Policy & Data Studio_ course in Summer 2020. 
+This is an example project to illustrate some organization and reproducability concepts for the _Policy & Data Studio_ course in Summer 2021. 
 
 ## Getting Started
 
